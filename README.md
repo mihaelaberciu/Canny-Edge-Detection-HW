@@ -1,0 +1,1 @@
+Implementare in Verilog al algoritmului de detectare margini Canny
