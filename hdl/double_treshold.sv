@@ -24,9 +24,6 @@ module double_threshold#(
   output reg [(PIX_WIDTH/3)-1:0] weak_edge [FRAME_HEIGHT-1:0][FRAME_WIDTH-1:0]   // weak edges output frame
 );
 
-// Internal frame buffer with padding
-//reg [(PIX_WIDTH/3)-1:0] padded_edge [FRAME_HEIGHT+1:0][FRAME_WIDTH+1:0];  // Edge frame with border reflection padding
-
 // State machine parameters
 localparam IDLE    = 2'd0;
 localparam PADDING = 2'd1;
@@ -40,39 +37,6 @@ reg [$clog2(FRAME_WIDTH )+1:0] padd_x;   // Padding x position
 reg [$clog2(FRAME_HEIGHT)+1:0] padd_y;   // Padding y position
 reg [$clog2(FRAME_WIDTH )-1:0] proc_x;   // Processing x position
 reg [$clog2(FRAME_HEIGHT)-1:0] proc_y;   // Processing y position
-
-// // Border reflection padding
-// always @(posedge clk or negedge rst_n)
-// if (~rst_n) padded_edge[padd_y][padd_x] <= 'd0; else 
-// if (state == PADDING) begin
-//   // Copy pixels from thin_edge to padded_edge with an offset of +1 in both dimensions
-//   if ((padd_y >= 1 && padd_y <= FRAME_HEIGHT) && (padd_x >= 1 && padd_x <= FRAME_WIDTH)) 
-//     padded_edge[padd_y][padd_x] <= thin_edge[padd_y-1][padd_x-1];
-//   // Top row padding (reflect from row 2)
-//   if (padd_y == 0) begin
-//     if (padd_x ==             0) padded_edge[0][0]                           <= thin_edge[1][1];             else 
-//     if (padd_x == FRAME_WIDTH+1) padded_edge[0][FRAME_WIDTH+1]               <= thin_edge[1][FRAME_WIDTH-2]; else  
-//                                  padded_edge[0][padd_x]                      <= thin_edge[1][padd_x-1];
-//   end
-//   // Bottom row padding (reflect from second last row)
-//   if (padd_y == FRAME_HEIGHT+1) begin
-//     if (padd_x ==             0) padded_edge[FRAME_HEIGHT+1][0]              <= thin_edge[FRAME_HEIGHT-2][1];             else 
-//     if (padd_x == FRAME_WIDTH+1) padded_edge[FRAME_HEIGHT+1][FRAME_WIDTH+1]  <= thin_edge[FRAME_HEIGHT-2][FRAME_WIDTH-2]; else
-//                                  padded_edge[FRAME_HEIGHT+1][padd_x]         <= thin_edge[FRAME_HEIGHT-2][padd_x-1];
-//   end
-//   // Left column padding (reflect from column 2)
-//   if (padd_x == 0) begin
-//     if (padd_y ==              0) padded_edge[0][0]                          <= thin_edge[1][1];              else 
-//     if (padd_y == FRAME_HEIGHT+1) padded_edge[FRAME_HEIGHT+1][0]             <= thin_edge[FRAME_HEIGHT-2][1]; else  
-//                                   padded_edge[padd_y][0]                     <= thin_edge[padd_y-1][1];
-//   end
-//   // Right column padding (reflect from second last column)
-//   if (padd_x == FRAME_WIDTH+1) begin
-//     if (padd_y ==              0) padded_edge[0][FRAME_WIDTH+1]              <= thin_edge[1][FRAME_WIDTH-2];              else 
-//     if (padd_y == FRAME_HEIGHT+1) padded_edge[FRAME_HEIGHT+1][FRAME_WIDTH+1] <= thin_edge[FRAME_HEIGHT-2][FRAME_WIDTH-2]; else  
-//                                   padded_edge[padd_y][FRAME_WIDTH+1]         <= thin_edge[padd_y-1][FRAME_WIDTH-2];
-//   end
-// end
 
 // Padding tracking - X axis of the frame - PADDING 
 always @(posedge clk or negedge rst_n) 
